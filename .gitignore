@@ -1,16 +1,46 @@
-*.iml
+# Gradle
+.gradle/
 .gradle
+build/
 /local.properties
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
+/github.properties
+
+# Android / IntelliJ
+.idea/
+*.iml
+*.iws
+*.ipr
 .DS_Store
-/build
-/captures
+
+# Kotlin
+.kotlin/
+*.hprof
+
+# iOS / Xcode
+*.mode1v3
+*.mode2v3
+*.moved-aside
+*.pbxuser
+*.perspectivev3
+*.users
+*.xccheckout
+*.xcuserstate
+xcuserdata/
+DerivedData/
+*.app
+*.ipa
+*.dSYM.zip
+*.dSYM
+/Podfile.lock
+Pods/
+**/*.framework
+!libs/**/*.framework
+
+# Generated Frameworks in KMP
+app/build/xcode-frameworks/
+app/build/bin/
+
+# Captures
+captures/
 .externalNativeBuild
 .cxx
-local.properties
-github.properties

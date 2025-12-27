@@ -3,9 +3,47 @@ import java.util.Properties
 
 plugins {
     alias(libs.plugins.android.library)
-    alias(libs.plugins.jetbrains.kotlin.android)
+    alias(libs.plugins.jetbrains.kotlin.multiplatform)
+    alias(libs.plugins.jetbrains.compose)
     alias(libs.plugins.compose.compiler)
     `maven-publish`
+}
+
+kotlin {
+    androidTarget {
+        publishLibraryVariants("release")
+        compilations.all {
+            kotlinOptions {
+                jvmTarget = "11"
+            }
+        }
+    }
+    
+    iosX64()
+    iosArm64()
+    iosSimulatorArm64()
+    
+    sourceSets {
+        commonMain.dependencies {
+            implementation(compose.runtime)
+            implementation(compose.foundation)
+            implementation(compose.material3)
+            implementation(compose.ui)
+            implementation(compose.components.resources)
+        }
+        
+        androidMain.dependencies {
+            implementation(libs.androidx.core.ktx)
+            implementation(libs.androidx.appcompat)
+            implementation(libs.material)
+            implementation(libs.androidx.activity.compose)
+            implementation(libs.androidx.ui.tooling.preview)
+        }
+        
+        iosMain.dependencies {
+        
+        }
+    }
 }
 
 android {
@@ -14,7 +52,6 @@ android {
 
     defaultConfig {
         minSdk = 24
-
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
     }
@@ -32,37 +69,14 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
-    kotlinOptions {
-        jvmTarget = "11"
-    }
 }
 
-dependencies {
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.appcompat)
-    implementation(libs.material)
-    implementation(libs.androidx.activity.compose)
-    implementation(platform(libs.androidx.compose.bom))
-    implementation(libs.androidx.ui)
-    implementation(libs.androidx.ui.graphics)
-    implementation(libs.androidx.material3)
-    implementation(libs.androidx.ui.tooling.preview)
-    implementation("androidx.compose.runtime:runtime-tracing:1.7.4")
-    androidTestImplementation(platform(libs.androidx.compose.bom))
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
-}
+group = project.findProperty("GROUP_ID") as String
+version = project.findProperty("VERSION_NAME") as String
 
 publishing {
-    publications {
-        create<MavenPublication>("release") {
-            artifact("build/outputs/aar/lazyinfinitegrid-release.aar")
-            groupId = "com.zeel"
-            artifactId = "lazyinfinitegrid"
-            version = "0.0.3"
-        }
-    }
+    // KMP automatically creates publications for defined targets
+    // e.g. 'androidRelease', 'iosArm64', 'kotlinMultiplatform'
 
     repositories {
         maven {
@@ -71,9 +85,15 @@ publishing {
             val propsFile = rootProject.file("github.properties")
             val props = Properties()
             props.load(FileInputStream(propsFile))
+
             credentials {
-                username = props.get("gpr.user") as String? ?: System.getenv("USERNAME")
-                password = props.get("gpr.token") as String? ?: System.getenv("TOKEN")
+                // Use Standard GitHub Actions Env Vars or local properties
+                username = System.getenv("GITHUB_ACTOR") 
+                    ?: props.get("gpr.user") as String?
+                    ?: System.getenv("USERNAME")
+                password = System.getenv("GITHUB_TOKEN") 
+                    ?: props.get("gpr.token") as String?
+                    ?: System.getenv("TOKEN")
             }
         }
     }
